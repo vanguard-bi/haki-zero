@@ -64,11 +64,14 @@ export async function callChain({ question, chatHistory }: callChainArgs) {
         data.append({
           sources: firstThreeLinesOfEachDocument, // Append first three lines of each document
         });
+
+
         
         data.close();
       });
 
     // Return the readable stream
+    
     return new StreamingTextResponse(stream, {}, data);
   } catch (e) {
     console.error(e);
