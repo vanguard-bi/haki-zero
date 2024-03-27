@@ -51,7 +51,7 @@ export function UserMenu({ user }: UserMenuProps) {
             <div className="text-xs text-zinc-500">{user?.email}</div>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
+          {/* <DropdownMenuItem asChild>
             <a
               href="https://vercel.com"
               target="_blank"
@@ -61,7 +61,7 @@ export function UserMenu({ user }: UserMenuProps) {
               Vercel Homepage
               <IconExternalLink className="size-3 ml-auto" />
             </a>
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
           <DropdownMenuItem
             onClick={() =>
               signOut({

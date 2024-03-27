@@ -21,6 +21,10 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { toast } from 'react-hot-toast'
 import { usePathname, useRouter } from 'next/navigation'
+import { auth } from '@/auth'
+import { Chat as ChatType } from '@/lib/types'
+import { nanoid } from 'nanoid'
+import { getUser } from '@/app/login/actions'
 
 const IS_PREVIEW = process.env.VERCEL_ENV === 'preview'
 export interface ChatProps extends React.ComponentProps<'div'> {
@@ -54,6 +58,35 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         if (!path.includes('chat')) {
           window.history.pushState({}, '', `/chat/${id}`)
         }
+
+        // const addChat = async () => {
+
+          
+        //   const session = await auth()
+        //   console.log("Session", session)
+        //   const chatId = id ?? nanoid()
+        //   if (session && session.user) {
+        //     const createdAt = new Date()
+        //     const userId = session.user.id as string
+        //     const path = `/chat/${chatId}`
+        //     const title = messages[0].content.substring(0, 100)
+
+        //     const chat: ChatType = {
+        //       id: id || 'none',
+        //       title,
+        //       userId,
+        //       createdAt,
+        //       messages,
+        //       path
+        //     }
+
+        //     await saveChat(chat)
+        //   } else {
+        //     return
+        //   }
+        // }
+
+        // addChat()
       }
     })
   return (

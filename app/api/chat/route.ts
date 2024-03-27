@@ -1,7 +1,6 @@
 import { kv } from '@vercel/kv'
 import {
   Message,
-  OpenAIStream,
   StreamingTextResponse,
   experimental_StreamData,
   LangChainStream
@@ -16,7 +15,6 @@ import {
   STANDALONE_QUESTION_TEMPLATE,
   QA_TEMPLATE
 } from '@/lib/rag/prompt-templates'
-
 
 import { auth } from '@/auth'
 import { nanoid } from '@/lib/utils'
@@ -34,19 +32,9 @@ const formatMessage = (message: Message) => {
 }
 
 export async function POST(req: Request) {
-  const json = await req.json()
-  const { messages, previewToken } = json
-  const userId = (await auth())?.user.id
-
-  if (!userId) {
-    return new Response('Unauthorized', {
-      status: 401
-    })
-  }
-
-  if (previewToken) {
-    openai.apiKey = previewToken
-  }
+  const body = await req.json()
+  const messages: Message[] = body.messages ?? []
+  const userId = (await auth())?.user?.id
 
   const formattedPreviousMessages = messages.slice(0, -1).map(formatMessage)
   const question = messages[messages.length - 1].content
@@ -56,9 +44,41 @@ export async function POST(req: Request) {
   const sanitizedQuestion = question.trim().replaceAll('\n', ' ')
   const pineconeClient = await getPinecone()
   const vectorStore = await getVectorStore(pineconeClient)
-  const { stream, handlers } = LangChainStream({
-    experimental_streamData: true
+
+  const addChat = async (completion: string) => {
+    const title = messages[0].content.substring(0, 100)
+    const id = body.id ?? nanoid()
+    const createdAt = Date.now()
+    const path = `/chat/${id}`
+    const payload = {
+      id,
+      title,
+      userId,
+      createdAt,
+      path,
+      messages: [
+        ...messages,
+        {
+          content: completion,
+          role: 'assistant'
+        }
+      ]
+    }
+    await kv.hmset(`chat:${id}`, payload)
+    await kv.zadd(`user:chat:${userId}`, {
+      score: createdAt,
+      member: `chat:${id}`
+    })
+  }
+
+  const langChainStream = LangChainStream({
+    experimental_streamData: true,
+    onFinal(completion) {
+      addChat(completion)
+    }
   })
+  const { stream, handlers } = langChainStream
+
   const data = new experimental_StreamData()
 
   const chain = ConversationalRetrievalQAChain.fromLLM(
@@ -85,10 +105,10 @@ export async function POST(req: Request) {
       [handlers]
     )
     .then(async res => {
+      console.log('The res sir', res)
       const sourceDocuments = res?.sourceDocuments
-      const completion = res?.content
-      const firstTwoDocuments = sourceDocuments.slice(0, 4)
-      const firstThreeLinesOfEachDocument = firstTwoDocuments.map(
+      const firstFourDocuments = sourceDocuments.slice(0, 4)
+      const firstThreeLinesOfEachDocument = firstFourDocuments.map(
         ({ pageContent }: { pageContent: string }) => {
           // Split the pageContent into lines and take the first six
           const lines = pageContent.split('\n').slice(0, 6)
@@ -100,34 +120,6 @@ export async function POST(req: Request) {
       data.append({
         sources: firstThreeLinesOfEachDocument // Append first three lines of each document
       })
-
-      const onCompletion = async () => {
-        const title = json.messages[0].content.substring(0, 100)
-        const id = json.id ?? nanoid()
-        const createdAt = Date.now()
-        const path = `/chat/${id}`
-        const payload = {
-          id,
-          title,
-          userId,
-          createdAt,
-          path,
-          messages: [
-            ...messages,
-            {
-              content: completion,
-              role: 'assistant'
-            }
-          ]
-        }
-        await kv.hmset(`chat:${id}`, payload)
-        await kv.zadd(`user:chat:${userId}`, {
-          score: createdAt,
-          member: `chat:${id}`
-        })
-      }
-
-      onCompletion()
 
       data.close()
     })
