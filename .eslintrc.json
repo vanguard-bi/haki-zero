@@ -9,9 +9,7 @@
   "plugins": ["tailwindcss"],
   "rules": {
     "tailwindcss/no-custom-classname": "off",
-    "tailwindcss/classnames-order": "off",
-    "react/no-unescaped-entities": "off",
-    "@next/next/no-page-custom-font": "off"
+    "tailwindcss/classnames-order": "off"
   },
   "settings": {
     "tailwindcss": {
