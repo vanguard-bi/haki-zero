@@ -6,10 +6,10 @@ import { getSources } from '@/lib/rag/utils'
 
 export interface ChatList {
   messages: Message[]
-  data?: JSONValue[] | undefined
+
 }
 
-export function ChatList({ messages, data }: ChatList) {
+export function ChatList({ messages }: ChatList) {
   if (!messages.length) {
     return null
   }
@@ -21,7 +21,7 @@ export function ChatList({ messages, data }: ChatList) {
         <div key={index}>
           <ChatMessage
             message={message}
-            sources={data?.length ? getSources(data, message.role, index) : []}
+            
           />
           {index < messages.length - 1 && (
             <Separator className="my-4 md:my-8" />

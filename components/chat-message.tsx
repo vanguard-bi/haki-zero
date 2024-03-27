@@ -29,12 +29,9 @@ const convertNewLines = (text: string) =>
 
 export interface ChatMessageProps {
   message: Message
-  sources: []
 }
 
-export function ChatMessage({ message, sources, ...props }: ChatMessageProps) {
-
- 
+export function ChatMessage({ message, ...props }: ChatMessageProps) {
   return (
     <div
       className={cn('group relative mb-4 flex items-start md:-ml-12')}
@@ -92,21 +89,7 @@ export function ChatMessage({ message, sources, ...props }: ChatMessageProps) {
         >
           {message.content}
         </MemoizedReactMarkdown>
-        {sources && sources.length ? (
-          <Accordion type="single" collapsible className="w-full">
-            {sources.map((source, index) => (
-              <AccordionItem value={`source-${index}`} key={index}>
-                <AccordionTrigger>{`Source ${index + 1}`}</AccordionTrigger>
-                <AccordionContent>
-                  {/* <ReactMarkdown target="_blank"> */}
-                  <Markdown>{formattedText(source)}</Markdown>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        ) : (
-          <></>
-        )}
+
         <ChatMessageActions message={message} />
       </div>
     </div>
