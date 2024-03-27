@@ -1,22 +1,28 @@
-import { type Message } from 'ai'
+import { JSONValue, type Message } from 'ai'
 
 import { Separator } from '@/components/ui/separator'
 import { ChatMessage } from '@/components/chat-message'
+import { getSources } from '@/lib/rag/utils'
 
 export interface ChatList {
   messages: Message[]
+  data?: JSONValue[] | undefined
 }
 
-export function ChatList({ messages }: ChatList) {
+export function ChatList({ messages, data }: ChatList) {
   if (!messages.length) {
     return null
   }
 
   return (
     <div className="relative mx-auto max-w-2xl px-4">
+      
       {messages.map((message, index) => (
         <div key={index}>
-          <ChatMessage message={message} />
+          <ChatMessage
+            message={message}
+            sources={data?.length ? getSources(data, message.role, index) : []}
+          />
           {index < messages.length - 1 && (
             <Separator className="my-4 md:my-8" />
           )}

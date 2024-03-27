@@ -63,11 +63,12 @@ export function UserMenu({ user }: UserMenuProps) {
             </a>
           </DropdownMenuItem> */}
           <DropdownMenuItem
-            onClick={() =>
+            onClick={() => {
               signOut({
                 callbackUrl: '/'
               })
-            }
+              console.log("Signed out")
+            }}
             className="text-xs"
           >
             Log Out

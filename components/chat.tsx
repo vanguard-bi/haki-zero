@@ -19,12 +19,9 @@ import {
 import { useState } from 'react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { usePathname, useRouter } from 'next/navigation'
-import { auth } from '@/auth'
-import { Chat as ChatType } from '@/lib/types'
-import { nanoid } from 'nanoid'
-import { getUser } from '@/app/login/actions'
+
 
 const IS_PREVIEW = process.env.VERCEL_ENV === 'preview'
 export interface ChatProps extends React.ComponentProps<'div'> {
@@ -41,7 +38,7 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
   )
   const [previewTokenDialog, setPreviewTokenDialog] = useState(IS_PREVIEW)
   const [previewTokenInput, setPreviewTokenInput] = useState(previewToken ?? '')
-  const { messages, append, reload, stop, isLoading, input, setInput } =
+  const { messages, append, reload, stop, isLoading, input, setInput, data } =
     useChat({
       initialMessages,
       id,
@@ -57,6 +54,7 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
       onFinish() {
         if (!path.includes('chat')) {
           window.history.pushState({}, '', `/chat/${id}`)
+          router.refresh();
         }
 
         // const addChat = async () => {
@@ -88,13 +86,14 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
 
         // addChat()
       }
-    })
+    }, 
+    )
   return (
     <>
       <div className={cn('pb-[200px] pt-4 md:pt-10', className)}>
         {messages.length ? (
           <>
-            <ChatList messages={messages} />
+            <ChatList messages={messages} data={data} />
             <ChatScrollAnchor trackVisibility={isLoading} />
           </>
         ) : (
@@ -110,6 +109,7 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         messages={messages}
         input={input}
         setInput={setInput}
+ 
       />
 
       <Dialog open={previewTokenDialog} onOpenChange={setPreviewTokenDialog}>

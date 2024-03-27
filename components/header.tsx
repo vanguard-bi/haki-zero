@@ -1,11 +1,14 @@
 import * as React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 import { cn } from '@/lib/utils'
 import { auth } from '@/auth'
 import { Button, buttonVariants } from '@/components/ui/button'
 import {
   IconGitHub,
+  IconHaki,
+  IconHakiWhite,
   IconNextChat,
   IconSeparator,
   IconVercel
@@ -28,8 +31,9 @@ async function UserOrLogin() {
         </>
       ) : (
         <Link href="/" target="_blank" rel="nofollow">
-          <IconNextChat className="size-6 mr-2 dark:hidden" inverted />
-          <IconNextChat className="hidden size-6 mr-2 dark:block" />
+         
+          <IconHakiWhite className="size-2 mr-2 dark:block" />
+          {/* <IconHakiWhite className=" size-10 mr-2 dark:block" /> */}
         </Link>
       )}
       <div className="flex items-center">

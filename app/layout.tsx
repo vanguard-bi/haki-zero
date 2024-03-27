@@ -1,4 +1,4 @@
-import { Toaster } from 'react-hot-toast'
+import { Toaster } from 'sonner'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 
