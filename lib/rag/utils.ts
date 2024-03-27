@@ -1,4 +1,4 @@
-import { HakiMessage } from "@/lib/types";
+
 import { JSONValue, Message } from "ai";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
