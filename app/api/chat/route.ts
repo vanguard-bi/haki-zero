@@ -1,15 +1,22 @@
 import { kv } from '@vercel/kv'
-import { OpenAIStream, StreamingTextResponse } from 'ai'
+import { Message, OpenAIStream, StreamingTextResponse } from 'ai'
 import OpenAI from 'openai'
 
 import { auth } from '@/auth'
 import { nanoid } from '@/lib/utils'
+import { callChain } from '@/lib/rag/langchain'
 
 export const runtime = 'edge'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 })
+
+const formatMessage = (message: Message) => {
+  return `${message.role === "user" ? "Human" : "Assistant"}: ${
+    message.content
+  }`;
+};
 
 export async function POST(req: Request) {
   const json = await req.json()
@@ -32,6 +39,14 @@ export async function POST(req: Request) {
     temperature: 0.7,
     stream: true
   })
+
+  const formattedPreviousMessages = messages.slice(0, -1).map(formatMessage);
+  const question = messages[messages.length - 1].content;
+
+  const streamingTextResponse = callChain({
+    question,
+    chatHistory: formattedPreviousMessages.join("\n"),
+  });
 
   const stream = OpenAIStream(res, {
     async onCompletion(completion) {
@@ -61,5 +76,6 @@ export async function POST(req: Request) {
     }
   })
 
-  return new StreamingTextResponse(stream)
+  // return new StreamingTextResponse(stream)
+  return streamingTextResponse
 }
