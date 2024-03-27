@@ -16,4 +16,4 @@ Answer the query with a bulleted summary. Provide website links where available.
 {context}
 
 Question: {question}
-Helpful answer in markdown:`;
+Helpful answer:`;

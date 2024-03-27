@@ -10,6 +10,15 @@ import { CodeBlock } from '@/components/ui/codeblock'
 import { MemoizedReactMarkdown } from '@/components/markdown'
 import { IconOpenAI, IconUser, IconMessage } from '@/components/ui/icons'
 import { ChatMessageActions } from '@/components/chat-message-actions'
+import Markdown from "react-markdown";
+
+const convertNewLines = (text: string) =>
+  text.split("\n").map((line, i) => (
+    <span key={i}>
+      <Markdown>{line}</Markdown>
+      <br />
+    </span>
+  ));
 
 export interface ChatMessageProps {
   message: Message
